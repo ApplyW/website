@@ -1,0 +1,370 @@
+/* ApplyW website.
+
+   Same system as the extension popup (see extension/src/popup/popup.css), derived from
+   the AW monogram: every stroke in the mark ends in a diagonal cut, so a skewed tick is
+   the one repeated motif — and it means "this was removed", never decoration. Navy marks
+   a blocked company, electric blue a job-level removal, exactly as in the extension. The
+   mark has no curves, so radius stays at 2px and buttons are not pills. */
+
+:root {
+  color-scheme: light dark;
+
+  --aw-surface: #ffffff;
+  --aw-recess: #f6f7f9;
+  --aw-text: #1b2438;
+  --aw-mute: #667089;
+  --aw-rule: rgba(36, 49, 76, 0.12);
+  --aw-mark: #24314c;
+  --aw-signal: #1a7bff;
+  --aw-signal-soft: rgba(26, 123, 255, 0.1);
+
+  --aw-radius: 2px;
+  --aw-shear: -18deg;
+  /* The monogram's stroke terminal, as a slanted right edge on the primary action.
+     13px of offset is the shear angle across the button's ~42px height. */
+  --aw-cut: polygon(0 0, 100% 0, calc(100% - 13px) 100%, 0 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --aw-surface: #14181f;
+    --aw-recess: #1b212b;
+    --aw-text: #e7ebf2;
+    --aw-mute: #8f9ab1;
+    --aw-rule: rgba(255, 255, 255, 0.12);
+    --aw-mark: #93a3c2;
+    --aw-signal: #5ea2ff;
+    --aw-signal-soft: rgba(94, 162, 255, 0.14);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--aw-text);
+  background: var(--aw-surface);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--aw-signal);
+  outline-offset: 3px;
+}
+
+a {
+  color: var(--aw-signal);
+}
+
+.page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* The one repeated motif. Only ever marks something the extension removed. */
+.tick {
+  flex: 0 0 auto;
+  width: 3px;
+  height: 15px;
+  background: var(--aw-mark);
+  transform: skewX(var(--aw-shear));
+}
+
+.tick-signal {
+  background: var(--aw-signal);
+}
+
+/* Header */
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 0;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--aw-text);
+  text-decoration: none;
+}
+
+.brand img {
+  border-radius: var(--aw-radius);
+  box-shadow: 0 0 0 1px var(--aw-rule);
+}
+
+/* Metrics, not yet built. Styled as plainly unavailable rather than as a link. */
+.soon {
+  position: relative;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--aw-mute);
+  cursor: default;
+}
+
+.soon::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  padding: 4px 9px;
+  font-size: 13px;
+  font-weight: 400;
+  white-space: nowrap;
+  color: var(--aw-surface);
+  background: var(--aw-mark);
+  border-radius: var(--aw-radius);
+  opacity: 0;
+  transform: translateY(-3px);
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.soon:hover::after,
+.soon:focus-visible::after {
+  opacity: 1;
+  transform: none;
+}
+
+/* Hero */
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 56px;
+  align-items: center;
+  padding: 56px 0 88px;
+}
+
+.mark {
+  width: 7px;
+  height: 30px;
+  margin-bottom: 22px;
+  background: var(--aw-signal);
+  transform: skewX(var(--aw-shear));
+}
+
+h1 {
+  margin: 0 0 20px;
+  font-size: 46px;
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.lede {
+  margin: 0 0 16px;
+  /* Comfortably under 80 characters at this size. */
+  max-width: 34em;
+  color: var(--aw-mute);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.note {
+  margin: 16px 0 0;
+  font-size: 14px;
+  color: var(--aw-mute);
+}
+
+/* The cut list: the product's own logic, shown rather than described. */
+
+.cutlist {
+  padding: 20px 22px 10px;
+  border: 1px solid var(--aw-rule);
+  border-radius: var(--aw-radius);
+  background: var(--aw-recess);
+}
+
+.cutlist-caption {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--aw-mute);
+}
+
+.cutlist ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--aw-rule);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.row-title,
+.row-company {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.row-title {
+  font-weight: 600;
+}
+
+.row-company {
+  font-size: 14px;
+  color: var(--aw-mute);
+}
+
+.row-reason {
+  flex: 0 0 auto;
+  font-size: 12px;
+  color: var(--aw-mute);
+}
+
+/* A removed listing: struck through and faded, with a tick naming why it went. Kept
+   listings carry no tick at all, so the two states read apart at a glance. */
+.is-cut {
+  opacity: 0.55;
+}
+
+.is-cut .row-title {
+  text-decoration: line-through;
+  font-weight: 400;
+}
+
+/* Buttons */
+
+.button-primary {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 11px 22px;
+  border: 1px solid var(--aw-signal);
+  border-radius: var(--aw-radius);
+  background: var(--aw-signal);
+  color: #ffffff;
+  text-decoration: none;
+  clip-path: var(--aw-cut);
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.button-primary:hover {
+  background: color-mix(in srgb, var(--aw-signal) 86%, black);
+  border-color: color-mix(in srgb, var(--aw-signal) 86%, black);
+}
+
+/* clip-path clips the focus outline off with the corner, so the ring is drawn inside. */
+.button-primary:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--aw-surface);
+}
+
+.button-quiet {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 11px 20px;
+  border: 1px solid var(--aw-rule);
+  border-radius: var(--aw-radius);
+  background: transparent;
+  color: var(--aw-text);
+  text-decoration: none;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+
+.button-quiet:hover {
+  border-color: var(--aw-signal);
+  color: var(--aw-signal);
+}
+
+/* Footer */
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 22px 0 40px;
+  border-top: 1px solid var(--aw-rule);
+}
+
+.footer-brand {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+}
+
+.footer-links a {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--aw-mute);
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  color: var(--aw-signal);
+}
+
+/* Responsive */
+
+@media (max-width: 860px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+    padding: 32px 0 56px;
+  }
+
+  h1 {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 520px) {
+  h1 {
+    font-size: 30px;
+  }
+
+  .row-reason {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .soon::after,
+  .button-primary,
+  .button-quiet {
+    transition: none;
+  }
+}
