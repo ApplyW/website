@@ -3,6 +3,9 @@
 Marketing site for [ApplyW](https://github.com/ApplyW/extension), a Chrome extension that
 declutters LinkedIn's job search page.
 
+**Live:** [applyw.chudnovskyi-v.workers.dev](https://applyw.chudnovskyi-v.workers.dev/) —
+deployed on Cloudflare Workers, redeploys on every push to `main`.
+
 ## Stack
 
 React, Vite, TypeScript.
@@ -65,11 +68,20 @@ straightened, list already filtered, no transitions.
 
 ## Deploying
 
-Cloudflare Pages, connected to this repo: build `npm run build`, output `dist`. Set
-`base` in `vite.config.ts` if it is ever served from a subpath rather than a domain root.
+Cloudflare Workers, connected to this repo — pushing to `main` builds and deploys. Build
+command `npm run build`, output `dist`. Set `base` in `vite.config.ts` if it is ever served
+from a subpath rather than a domain root.
 
-Once live, the URL belongs in the Chrome Web Store listing's **Website** field — that is
-what publicly ties the site to the extension.
+The URL belongs in the Chrome Web Store listing's **Website** field — that is what
+publicly ties the site to the extension.
+
+Anything dropped in `public/` is served from the site root, which is how to place a Google
+Search Console verification file (no DNS access on a `workers.dev` subdomain).
+
+## Related repositories
+
+- [extension](https://github.com/ApplyW/extension) — the Chrome extension this site is for
+- [backend](https://github.com/ApplyW/backend) — not used by this site
 
 ## Known gap
 
