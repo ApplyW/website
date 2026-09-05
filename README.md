@@ -1,5 +1,10 @@
 # ApplyW — Website
 
+[![Website](https://img.shields.io/badge/website-live-1c6feb.svg)](https://applyw.chudnovskyi-v.workers.dev/)
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/imllbmbpfpgnibchclonahimmkjanjhp?color=1c6feb&label=chrome%20web%20store)](https://chromewebstore.google.com/detail/imllbmbpfpgnibchclonahimmkjanjhp)
+[![License: MIT](https://img.shields.io/badge/license-MIT-1c6feb.svg)](./LICENSE)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-1c6feb.svg)](https://github.com/ApplyW/extension/issues)
+
 Marketing site for [ApplyW](https://github.com/ApplyW/extension), a Chrome extension that
 declutters LinkedIn's job search page.
 
@@ -12,10 +17,13 @@ React, Vite, TypeScript.
 
 ## Status
 
-🚧 Early development. A single screen: what the extension solves, where to install it, and
-where to report a problem. A metrics page is stubbed in the header as unavailable —
-`Metrics` is deliberately a `<span>`, not a link, because a dead link is worse than an
-honest disabled control.
+Live, two screens. The landing page says what the extension solves, plays it out in a
+mock result list, and links to the store; `/#metrics` reads the visitor's own counts out
+of the installed extension and ranks their filters. Both are described below.
+
+It is deliberately a small site: no analytics, no cookies, no form, nothing stored in the
+visitor's browser — the extension is sold on "nothing leaves your browser", and a site
+that tracked its readers would contradict that in public.
 
 ## Setup
 
@@ -41,10 +49,11 @@ working, not failing.
 
 ## The page
 
-**It never scrolls.** The nav sits against the top of the viewport and the footer against
-the bottom, with the hero taking the slack between them. Scroll locking only applies above
-881px wide and 660px tall — below either, the content genuinely cannot fit, and hiding the
-overflow would put the install button permanently out of reach.
+**On a desktop it never scrolls.** The nav sits against the top of the viewport and the
+footer against the bottom, with the hero taking the slack between them. Scroll locking only
+applies above 881px wide and 660px tall — below either, including every phone, the content
+genuinely cannot fit, and hiding the overflow would put the install button permanently out
+of reach, so the page is left free to scroll.
 
 **The hero demonstrates the product instead of describing it.** A mock result list plays
 out each filter in turn, striking jobs out one at a time and labelling why each one went
@@ -57,7 +66,10 @@ only two lines: enumerating the filters in prose would say the same thing twice.
 
 `/#metrics` shows which of the visitor's own filters is hiding the most listings. The data
 comes from the installed extension over `chrome.runtime.sendMessage` — a browser-internal
-call, not a network request — so the page shows an install prompt to anyone without it.
+call, not a network request — so there is nothing to show without it. A silent extension
+is either missing or too old to answer, and the two are indistinguishable from here, so
+the fallback names the version needed rather than telling someone to install what they
+may already have.
 
 Two views of one dataset because they answer different questions: a stacked strip for share
 of the whole, then ranked bars, which share a baseline and are therefore what you actually
@@ -133,3 +145,14 @@ This is a client-rendered SPA, so the body content only exists after JavaScript 
 `<title>` and the meta description in `index.html` are static and index fine, but the
 headline and copy depend on rendering. If search ranking starts to matter, convert this
 page to static HTML — the design and copy port over unchanged.
+
+## Contributing
+
+Issues and pull requests are welcome. Anything about the extension itself — a bug, a
+missing filter — belongs in
+[ApplyW/extension](https://github.com/ApplyW/extension/issues), which is where the site's
+own "Report a problem" link points.
+
+## License
+
+MIT — see [LICENSE](./LICENSE).
