@@ -9,12 +9,30 @@
       name="description"
       content="A Chrome extension that hides jobs, blocks companies, and filters LinkedIn job search by language and keyword. Runs entirely in your browser."
     />
+    <!-- __SITE_URL__ is filled in at build time from vite.config.ts, so the domain is
+         written down in exactly one place. -->
+    <link rel="canonical" href="__SITE_URL__/" />
     <meta property="og:title" content="ApplyW — Cut the noise from LinkedIn job search" />
     <meta
       property="og:description"
       content="Hide jobs, block companies, and filter by language or keyword. No account, no server, nothing leaves your browser."
     />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ApplyW" />
+    <meta property="og:url" content="__SITE_URL__/" />
+    <!-- Absolute, and 1200x630: a relative path or an odd ratio gets the preview dropped
+         or badly cropped by most of the places this link will be posted. -->
+    <meta property="og:image" content="__SITE_URL__/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="The ApplyW site: cut the noise from LinkedIn job search" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ApplyW — Cut the noise from LinkedIn job search" />
+    <meta
+      name="twitter:description"
+      content="Hide jobs, block companies, and filter by language or keyword. No account, no server, nothing leaves your browser."
+    />
+    <meta name="twitter:image" content="__SITE_URL__/og.png" />
   </head>
   <body>
     <div id="root"></div>
