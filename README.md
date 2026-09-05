@@ -11,6 +11,8 @@ declutters LinkedIn's job search page.
 **Live:** [applyw.chudnovskyi-v.workers.dev](https://applyw.chudnovskyi-v.workers.dev/) —
 deployed on Cloudflare Workers, redeploys on every push to `main`.
 
+![The ApplyW landing page: the headline, the install button, and a mock LinkedIn result list striking out the jobs each filter removes](docs/screenshot.png)
+
 ## Stack
 
 React, Vite, TypeScript.
@@ -134,10 +136,35 @@ publicly ties the site to the extension.
 Anything dropped in `public/` is served from the site root, which is how to place a Google
 Search Console verification file (no DNS access on a `workers.dev` subdomain).
 
+### The site's own address
+
+`SITE_URL` at the top of [`vite.config.ts`](./vite.config.ts) is the single source of truth
+for it. The canonical link, the `og:`/`twitter:` preview tags, `robots.txt` and
+`sitemap.xml` are all generated from that constant at build time — `robots.txt` and
+`sitemap.xml` are emitted by the build rather than sitting in `public/`, because a static
+file there cannot name the site absolutely.
+
+Moving to a custom domain, in order:
+
+1. Point the domain at the Worker (Cloudflare → the Worker → **Domains & Routes**), and
+   keep the `workers.dev` URL serving as well until step 4 is done.
+2. Change `SITE_URL` here and deploy. Everything above follows from it.
+3. Add the new origin to `SITE_ORIGINS` in the extension's `manifest.config.ts`, **keeping
+   the old one**, and ship that to the store. Until that review clears — days, not minutes
+   — a visitor on the new domain has an extension that refuses to talk to it, and the
+   metrics page will tell them to install what they already have.
+4. Once the new version has rolled out, drop the old origin from `SITE_ORIGINS` and the
+   old address from the Chrome Web Store listing's **Website** field.
+5. Verify the new domain in Google Search Console (DNS verification is available on a
+   domain you own, unlike a `workers.dev` subdomain) and submit `/sitemap.xml`.
+
+Do not reorder 2 and 3. Shipping the extension first is harmless; shipping the site first
+breaks metrics for everyone for the length of a store review.
+
 ## Related repositories
 
-- [extension](https://github.com/ApplyW/extension) — the Chrome extension this site is for
-- [backend](https://github.com/ApplyW/backend) — not used by this site
+- [extension](https://github.com/ApplyW/extension) — the Chrome extension this site is for,
+  and where the metrics page gets its numbers
 
 ## Known gap
 
