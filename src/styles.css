@@ -872,20 +872,160 @@ h1 {
   flex: 0 0 auto;
 }
 
-/* Responsive */
+/* Responsive
+   ------------------------------------------------------------------
+   Everything below 881px is additive: no rule here changes anything a desktop browser
+   sees. Type sizes are still handled by the clamps above, so there are no size jumps at a
+   breakpoint — these queries move things, they don't resize them.
 
-/* Layout only — type sizes are handled by the clamps above, so there are no size jumps
-   at a breakpoint any more. */
+   The phone is a different composition, not a squeezed desktop one. On a wide screen the
+   ribbons live in empty gutters and the two hero halves sit side by side; on a phone there
+   are no gutters at all, so most of the work here is keeping decoration out of the reading
+   column rather than shrinking it. */
+
 @media (max-width: 880px) {
+  html,
+  body {
+    /* iOS Safari otherwise inflates body text when the phone is turned sideways, which
+       breaks every clamp() on the page. */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .page {
+    padding-left: clamp(18px, 5vw, 26px);
+    padding-right: clamp(18px, 5vw, 26px);
+  }
+
+  /* A fixed layer whose children hang off every edge can extend the scrollable area on
+     mobile browsers, which shows up as a page that drifts sideways. Clipping to the
+     viewport changes nothing visually — the viewport was already the crop. */
+  .ribbons {
+    overflow: hidden;
+  }
+
+  /* Three strips instead of six, and only two of them reach into the page: without
+     gutters, every strip that reaches inward lands on top of body copy. 2, 4 and 5 crossed
+     the middle of a full-width column, so they go; 1 and 6 are re-aimed straight through
+     the opposite corners, where a band passing through the corner shows as a small wedge
+     inside the page's own padding and never meets the text. Still lopsided, still nothing
+     mirrored — one navy corner, one blue corner, one blue sliver down the left edge. */
+  .ribbon-3,
+  .ribbon-4,
+  .ribbon-5 {
+    display: none;
+  }
+
+  .ribbon-1 {
+    top: -57px;
+    left: -78px;
+    width: 230px;
+    height: 46px;
+  }
+
+  .ribbon-2 {
+    top: 262px;
+    left: -120px;
+    width: 190px;
+    height: 26px;
+  }
+
+  .ribbon-6 {
+    bottom: -48px;
+    right: -93px;
+    width: 230px;
+    height: 44px;
+  }
+
+  /* Copy first, the demonstration under it. */
   .hero {
     grid-template-columns: minmax(0, 1fr);
     align-items: start;
+    gap: clamp(26px, 6vw, 40px);
+    padding: clamp(24px, 6vw, 40px) 0 clamp(28px, 7vw, 44px);
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 620px) {
+  /* The reason each listing went is the whole point of the demo, so it moves onto its own
+     line rather than being dropped. It is already in the flow at opacity 0, so reserving
+     the line costs nothing and no row changes height as the sequence plays. */
+  .row-button {
+    flex-wrap: wrap;
+    gap: 0 11px;
+    padding: 10px 2px;
+  }
+
   .row-reason {
+    flex: 1 0 100%;
+    order: 1;
+    /* Lines up under the title rather than under the tick. */
+    padding-left: 14px;
+    margin-top: 1px;
+  }
+
+  /* Full width, so the one thing worth pressing is the width of the thumb's reach. The
+     slanted edge survives the stretch — it is a fixed 13px, not a proportion. */
+  .actions {
+    display: block;
+  }
+
+  .button-primary {
+    display: block;
+    text-align: center;
+  }
+
+  /* Wrapped pipes strand a separator at the start or end of a line, so the row centres
+     itself and the gaps do the separating instead. */
+  .footer {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 14px;
+  }
+
+  .footer-links {
+    justify-content: center;
+    gap: 10px 18px;
+  }
+
+  .footer-links a {
+    /* Taller hit area than the text alone gives. */
+    padding: 3px 0;
+  }
+
+  .sep {
     display: none;
+  }
+
+  /* Metrics: label, bar and number can't share a line at this width without the bar
+     shrinking past the point where comparing lengths — the only reason it is there —
+     still works. It takes a full-width line under the label instead. */
+  .rank-row {
+    flex-wrap: wrap;
+    gap: 6px 12px;
+  }
+
+  .rank-bar {
+    flex: 1 0 100%;
+    order: 1;
+    height: 10px;
+  }
+
+  .rank-value {
+    min-width: 0;
+  }
+
+  .word-list li {
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+
+  .word-list .rank-bar {
+    height: 8px;
+  }
+
+  .words {
+    padding-left: 0;
   }
 }
 

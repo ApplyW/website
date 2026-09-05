@@ -96,6 +96,17 @@ what you have to click.
 ceiling, so nothing jumps at a breakpoint and nothing is oversized on a laptop or lost on
 a 4K display. The media queries handle layout only — don't reintroduce font sizes there.
 
+**Phones.** Every rule below 881px is additive, so nothing there can change what a desktop
+browser renders — keep it that way. A phone is a different composition rather than a
+squeezed desktop one, and the difference is the gutters: on a wide screen the ribbons live
+in empty margin, on a phone there is none. So three of the six are dropped and the two that
+remain are aimed *through* the corners, where a band shows only as a wedge inside the
+page's own padding and never crosses text. Below 620px the cut list's reason moves onto its
+own line rather than being hidden — it is what makes the demo legible — and it can do that
+for free because the reason is already in the flow at `opacity: 0`, so no row changes
+height as the sequence plays. The metrics bars get the same treatment for the same reason:
+a bar squeezed to 30px can't be compared with another, so it takes a full-width line.
+
 Motion respects `prefers-reduced-motion` throughout: ribbons already taped down and
 straightened, list already filtered, no transitions.
 
