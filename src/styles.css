@@ -4,7 +4,11 @@
    the AW monogram: every stroke in the mark ends in a diagonal cut, so a skewed tick is
    the one repeated motif — and it means "this was removed", never decoration. Navy marks
    a blocked company, electric blue a job-level removal, exactly as in the extension. The
-   mark has no curves, so radius stays at 2px and buttons are not pills. */
+   mark has no curves, hence a 2px radius throughout and no pill-shaped buttons.
+
+   Motion: the product is subtractive, so the signature movement is removal, not arrival.
+   The page entrance is deliberately short and low-travel; the one real moment is the hero
+   list cutting itself down, which doubles as the product demo. */
 
 :root {
   color-scheme: light dark;
@@ -21,7 +25,7 @@
   --aw-radius: 2px;
   --aw-shear: -18deg;
   /* The monogram's stroke terminal, as a slanted right edge on the primary action.
-     13px of offset is the shear angle across the button's ~42px height. */
+     13px of offset is the shear angle across the button's ~44px height. */
   --aw-cut: polygon(0 0, 100% 0, calc(100% - 13px) 100%, 0 100%);
 }
 
@@ -61,10 +65,220 @@ a {
   color: var(--aw-signal);
 }
 
+/* Everything in the middle is sized fluidly rather than at fixed pixels with breakpoint
+   jumps — that was why it read as oversized on a laptop and undersized on a large display.
+   Each clamp() has a floor, a viewport-relative middle and a ceiling, so the column and
+   its type grow together and stop growing before they get silly.
+
+   The centre is also kept deliberately quiet: the ribbons are the loud element, so the
+   content is orthogonal, low-chrome, and mostly black on white. */
+/* One screen, no scrolling: nav against the top, footer against the bottom, hero taking
+   the slack between them. */
 .page {
-  max-width: 1080px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  max-width: clamp(960px, 76vw, 1200px);
   margin: 0 auto;
-  padding: 0 24px;
+  padding: clamp(8px, 1.2vw, 18px) clamp(24px, 3vw, 44px) 0;
+}
+
+/* Scrolling is only locked where the page is genuinely known to fit. Below these sizes it
+   can't, and hiding the overflow would put content permanently out of reach. */
+@media (min-width: 881px) and (min-height: 660px) {
+  html,
+  body {
+    overflow: hidden;
+  }
+
+  .page {
+    height: 100dvh;
+  }
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ribbons: two wide bands slicing across opposite corners.
+
+   Both lean the same way as every stroke in the monogram and as the ticks, which is why
+   they cut the corners diagonally instead of tracing the edges — an orthogonal frame would
+   contradict a mark that has no right angles in it.
+
+   Sized entirely in pixels and positioned fixed, so the band is exactly 46px thick and
+   cuts exactly the same corner on a 1440 and a 4K display; it never scales with the
+   window. They're shown only above 1360px, because below that the gutters aren't wide
+   enough to hold them and they would run straight through the nav and the footer. That
+   also matches the problem they solve: the empty margin is a wide-screen condition. */
+
+/* Always present at every width, and always drawn over the page rather than hidden when
+   content comes close to the edge — the ribbons are wrapped around the outside of the
+   page, so passing over the corner of something is the point. pointer-events: none means
+   nothing underneath ever becomes unclickable. */
+.ribbons {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+/* A rotated window with a band sliding through it: the band enters from off its own end,
+   so the strip lays itself down along its length like tape rather than fading in.
+   --tilt is the angle it lands at, --angle where it ends up once the set is straightened. */
+.ribbon {
+  position: absolute;
+  overflow: hidden;
+  transform: rotate(var(--tilt));
+  transition: transform 460ms cubic-bezier(0.3, 0.8, 0.4, 1);
+}
+
+.ribbons.is-settled .ribbon {
+  transform: rotate(var(--angle));
+}
+
+.ribbon > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ribbons.is-in .ribbon > span {
+  transform: none;
+}
+
+/* Nothing below is shared between the strips on purpose: angle, thickness, length, where
+   it sits, how far it pokes in, how its ends are cut, when it arrives, how fast, and which
+   end it enters from. No strip is the mirror of another, and four are gathered down the
+   left against two on the right — a balanced set reads as machine-placed.
+
+   Every strip is anchored to an edge with a large negative offset, so most of its length
+   hangs off-screen and only a corner of it reaches into the page. Each one's two end cuts
+   are also not parallel to each other: torn and pressed down, not drawn. */
+
+/* 1 — the anchor: thick navy across the top-left corner. */
+.ribbon-1 {
+  --tilt: -41.6deg;
+  --angle: -43deg;
+  top: 40px;
+  left: -110px;
+  width: 330px;
+  height: 44px;
+  clip-path: polygon(14px 0, 100% 0, calc(100% - 20px) 100%, 0 100%);
+  transition-delay: 90ms;
+}
+
+.ribbon-1 > span {
+  background: var(--aw-mark);
+  transform: translateX(-101%);
+  transition: transform 700ms cubic-bezier(0.2, 0.75, 0.3, 1) 440ms;
+}
+
+/* 2 — steep blue over the left edge, mostly off-screen. */
+.ribbon-2 {
+  --tilt: -75.5deg;
+  --angle: -74deg;
+  top: 262px;
+  left: -96px;
+  width: 210px;
+  height: 28px;
+  clip-path: polygon(9px 0, 100% 0, calc(100% - 15px) 100%, 0 100%);
+  transition-delay: 0ms;
+}
+
+.ribbon-2 > span {
+  background: var(--aw-signal);
+  transform: translateX(101%);
+  transition: transform 560ms cubic-bezier(0.25, 0.7, 0.35, 1) 660ms;
+}
+
+/* 3 — the smallest, low on the left. Arrives late. */
+.ribbon-3 {
+  --tilt: -53.4deg;
+  --angle: -55deg;
+  bottom: 210px;
+  left: -84px;
+  width: 165px;
+  height: 26px;
+  clip-path: polygon(7px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+  transition-delay: 250ms;
+}
+
+.ribbon-3 > span {
+  background: var(--aw-mark);
+  transform: translateX(101%);
+  transition: transform 600ms cubic-bezier(0.25, 0.65, 0.35, 1) 1420ms;
+}
+
+/* 4 — the odd one: a shallow blue strip lying across the top edge, well off-centre. */
+.ribbon-4 {
+  --tilt: -14.4deg;
+  --angle: -16deg;
+  top: -64px;
+  left: 300px;
+  width: 250px;
+  height: 30px;
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+  transition-delay: 170ms;
+}
+
+.ribbon-4 > span {
+  background: var(--aw-signal);
+  transform: translateX(-101%);
+  transition: transform 780ms cubic-bezier(0.2, 0.7, 0.3, 1) 900ms;
+}
+
+/* 5 — navy over the right edge, high up. */
+.ribbon-5 {
+  --tilt: -69.2deg;
+  --angle: -68deg;
+  top: 300px;
+  right: -92px;
+  width: 195px;
+  height: 32px;
+  clip-path: polygon(9px 0, 100% 0, calc(100% - 16px) 100%, 0 100%);
+  transition-delay: 320ms;
+}
+
+.ribbon-5 > span {
+  background: var(--aw-mark);
+  transform: translateX(-101%);
+  transition: transform 520ms cubic-bezier(0.2, 0.8, 0.3, 1) 1150ms;
+}
+
+/* 6 — blue across the bottom-right corner, cutting it tighter than 1 cuts its own.
+   The last to land, and the slowest. */
+.ribbon-6 {
+  --tilt: -50.4deg;
+  --angle: -49deg;
+  bottom: 52px;
+  right: -70px;
+  width: 250px;
+  height: 36px;
+  clip-path: polygon(11px 0, 100% 0, calc(100% - 16px) 100%, 0 100%);
+  transition-delay: 40ms;
+}
+
+.ribbon-6 > span {
+  background: var(--aw-signal);
+  transform: translateX(101%);
+  transition: transform 840ms cubic-bezier(0.25, 0.6, 0.3, 1) 1680ms;
+}
+
+/* Staggered entrance. 10px of travel over 420ms, not 80px over 700 — enough to feel
+   sequenced, short enough that nobody watches the page assemble itself. */
+.enter {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 420ms ease, transform 420ms ease;
+}
+
+.enter.is-in {
+  opacity: 1;
+  transform: none;
 }
 
 /* The one repeated motif. Only ever marks something the extension removed. */
@@ -82,19 +296,23 @@ a {
 
 /* Header */
 
+/* Above the ribbons. Decoration is allowed to cross the hero and the result panel — that
+   overlap is the point — but never the things you have to read or click. */
 .nav {
+  position: relative;
+  z-index: 21;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 22px 0;
+  padding: clamp(16px, 1.8vw, 26px) 0;
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-size: 17px;
+  font-size: clamp(16px, 1.2vw, 19px);
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--aw-text);
@@ -141,64 +359,106 @@ a {
 
 /* Hero */
 
+/* Fills the space between nav and footer rather than adding fixed padding, so the single
+   screen stays balanced at any height. */
 .hero {
+  flex: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 56px;
+  gap: clamp(32px, 4vw, 64px);
   align-items: center;
-  padding: 56px 0 88px;
+  padding: clamp(16px, 2vw, 40px) 0;
 }
 
+/* The tick above the headline, at display scale. */
 .mark {
-  width: 7px;
-  height: 30px;
-  margin-bottom: 22px;
+  width: 10px;
+  height: clamp(34px, 3vw, 46px);
+  margin-bottom: clamp(16px, 1.8vw, 26px);
   background: var(--aw-signal);
   transform: skewX(var(--aw-shear));
 }
 
+/* The entrance sets a transform of its own, which would cancel the skew — so both are
+   written out together here. */
+.mark.enter {
+  transform: translateY(10px) skewX(var(--aw-shear));
+}
+
+.mark.enter.is-in {
+  transform: skewX(var(--aw-shear));
+}
+
 h1 {
-  margin: 0 0 20px;
-  font-size: 46px;
+  margin: 0 0 clamp(14px, 1.4vw, 22px);
+  /* Caps well below the viewport-relative value so a 4K display doesn't get a billboard. */
+  font-size: clamp(30px, 3.3vw, 54px);
   line-height: 1.08;
   font-weight: 700;
   letter-spacing: -0.025em;
 }
 
+/* Two tiers, not one sentence broken by a <br>: the first line enumerates, the second is
+   the payoff and carries the weight. */
 .lede {
-  margin: 0 0 16px;
-  /* Comfortably under 80 characters at this size. */
-  max-width: 34em;
+  margin: 0;
+  max-width: 30em;
+  font-size: clamp(15px, 1.15vw, 19px);
   color: var(--aw-mute);
+}
+
+.lede-strong {
+  margin: 6px 0 0;
+  font-size: clamp(18px, 1.5vw, 25px);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--aw-text);
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 28px;
+  margin-top: clamp(20px, 2.2vw, 34px);
 }
 
 .note {
-  margin: 16px 0 0;
-  font-size: 14px;
+  margin: clamp(12px, 1.2vw, 18px) 0 0;
+  font-size: clamp(13px, 0.9vw, 14px);
   color: var(--aw-mute);
 }
 
-/* The cut list: the product's own logic, shown rather than described. */
+/* The cut list: the product demonstrating itself. */
 
+/* Its own font-size drives the rows, which size in em from here, so the whole mock scales
+   as one thing rather than drifting apart. */
 .cutlist {
-  padding: 20px 22px 10px;
+  padding: clamp(12px, 1.2vw, 20px) clamp(14px, 1.4vw, 24px) 6px;
   border: 1px solid var(--aw-rule);
   border-radius: var(--aw-radius);
   background: var(--aw-recess);
+  font-size: clamp(14px, 1.05vw, 16px);
 }
 
-.cutlist-caption {
-  margin: 0 0 6px;
-  font-size: 13px;
+.cutlist-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 6px;
+}
+
+.cutlist-caption,
+.cutlist-count {
+  margin: 0;
+  font-size: 0.8em;
   font-weight: 600;
   color: var(--aw-mute);
+}
+
+.cutlist-count b {
+  color: var(--aw-text);
+  font-variant-numeric: tabular-nums;
 }
 
 .cutlist ul {
@@ -208,10 +468,6 @@ h1 {
 }
 
 .row {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 13px 0;
   border-bottom: 1px solid var(--aw-rule);
 }
 
@@ -219,52 +475,137 @@ h1 {
   border-bottom: none;
 }
 
+/* The whole row is the control once the opening sequence hands over — hiding and
+   restoring here is the same gesture the extension uses. */
+.row-button {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 13px 2px;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: none;
+  transition: opacity 320ms ease;
+}
+
+.row-button:not(:disabled) {
+  cursor: pointer;
+}
+
+/* Only advertises itself as clickable after control has been handed over. */
+.row-button:not(:disabled):hover .row-title {
+  color: var(--aw-signal);
+}
+
+.row.is-cut .row-button {
+  opacity: 0.5;
+}
+
 .row-body {
   flex: 1;
   min-width: 0;
 }
 
-.row-title,
 .row-company {
   display: block;
+  font-size: 0.85em;
+  color: var(--aw-mute);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
+/* inline-block so the strike below spans the text, not the whole column. */
 .row-title {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
   font-weight: 600;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
 }
 
-.row-company {
-  font-size: 14px;
-  color: var(--aw-mute);
+/* The strike is drawn, not switched on: a line sweeping across the title is what makes
+   this read as a cut rather than a state flip. text-decoration can't be animated. */
+.row-title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 52%;
+  width: 0;
+  height: 1.5px;
+  background: currentColor;
+  transition: width 300ms ease;
+}
+
+.is-cut .row-title::after {
+  width: 100%;
 }
 
 .row-reason {
   flex: 0 0 auto;
+  font-size: 0.75em;
+  color: var(--aw-mute);
+}
+
+/* Tick and reason are always in the DOM so nothing reflows when they arrive — they only
+   fade in as their row is cut. */
+.cutlist .row .tick,
+.cutlist .row-reason {
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.cutlist .row.is-cut .tick,
+.cutlist .row.is-cut .row-reason {
+  opacity: 1;
+}
+
+.cutlist-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  /* Reserved so the panel doesn't jump when the hint and Reset appear. */
+  min-height: 38px;
+}
+
+.hint {
+  margin: 0;
   font-size: 12px;
   color: var(--aw-mute);
 }
 
-/* A removed listing: struck through and faded, with a tick naming why it went. Kept
-   listings carry no tick at all, so the two states read apart at a glance. */
-.is-cut {
-  opacity: 0.55;
+.replay {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border: 1px solid var(--aw-rule);
+  border-radius: var(--aw-radius);
+  background: transparent;
+  color: var(--aw-mute);
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease;
 }
 
-.is-cut .row-title {
-  text-decoration: line-through;
-  font-weight: 400;
+.replay:hover {
+  border-color: var(--aw-signal);
+  color: var(--aw-signal);
 }
 
 /* Buttons */
 
 .button-primary {
   font: inherit;
-  font-size: 15px;
+  font-size: clamp(14px, 1vw, 16px);
   font-weight: 700;
-  padding: 11px 22px;
+  padding: clamp(11px, 0.9vw, 14px) clamp(18px, 1.8vw, 28px);
   border: 1px solid var(--aw-signal);
   border-radius: var(--aw-radius);
   background: var(--aw-signal);
@@ -285,37 +626,25 @@ h1 {
   box-shadow: inset 0 0 0 2px var(--aw-surface);
 }
 
-.button-quiet {
-  font: inherit;
-  font-size: 15px;
-  font-weight: 600;
-  padding: 11px 20px;
-  border: 1px solid var(--aw-rule);
-  border-radius: var(--aw-radius);
-  background: transparent;
-  color: var(--aw-text);
-  text-decoration: none;
-  transition: border-color 120ms ease, color 120ms ease;
-}
-
-.button-quiet:hover {
-  border-color: var(--aw-signal);
-  color: var(--aw-signal);
-}
-
 /* Footer */
 
+/* Same protection as the nav: the ribbons cross the corners it lives in, and a decorative
+   band is never allowed to swallow a link. */
 .footer {
+  position: relative;
+  z-index: 21;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
-  padding: 22px 0 40px;
+  gap: 10px clamp(16px, 2vw, 30px);
+  margin-top: clamp(24px, 3vw, 48px);
+  padding: clamp(14px, 1.4vw, 20px) 0 clamp(18px, 2vw, 30px);
   border-top: 1px solid var(--aw-rule);
 }
 
 .footer-brand {
+  font-size: clamp(14px, 1vw, 16px);
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -323,48 +652,93 @@ h1 {
 .footer-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 22px;
+  align-items: center;
+  gap: 12px;
 }
 
+/* Text colour at reduced opacity rather than the flat mute grey: it reads as clearly
+   secondary but stays legible at a distance on a large display, where a faint grey at a
+   small size is the first thing to drop out. */
 .footer-links a {
-  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: clamp(13px, 0.95vw, 15px);
   font-weight: 600;
-  color: var(--aw-mute);
+  color: var(--aw-text);
+  opacity: 0.68;
   text-decoration: none;
+  transition: opacity 120ms ease, color 120ms ease;
 }
 
 .footer-links a:hover {
   color: var(--aw-signal);
+  opacity: 1;
+}
+
+.sep {
+  color: var(--aw-text);
+  opacity: 0.25;
+  user-select: none;
+}
+
+.icon {
+  flex: 0 0 auto;
 }
 
 /* Responsive */
 
-@media (max-width: 860px) {
+/* Layout only — type sizes are handled by the clamps above, so there are no size jumps
+   at a breakpoint any more. */
+@media (max-width: 880px) {
   .hero {
     grid-template-columns: minmax(0, 1fr);
-    gap: 40px;
-    padding: 32px 0 56px;
-  }
-
-  h1 {
-    font-size: 36px;
+    align-items: start;
   }
 }
 
 @media (max-width: 520px) {
-  h1 {
-    font-size: 30px;
-  }
-
   .row-reason {
     display: none;
   }
 }
 
+/* Nothing animates, and nothing can be left stranded invisible. */
 @media (prefers-reduced-motion: reduce) {
+  .enter {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  /* Already taped down and already straightened. */
+  .ribbon {
+    transform: rotate(var(--angle));
+    transition: none;
+  }
+
+  .ribbon > span {
+    transform: none;
+    transition: none;
+  }
+
+  .mark.enter {
+    transform: skewX(var(--aw-shear));
+  }
+
+  /* Only kill the transition — forcing opacity here would label the surviving rows as
+     removed, since every row now carries a tick and a reason. */
+  .cutlist .row .tick,
+  .cutlist .row-reason {
+    transition: none;
+  }
+
+  .row-button,
+  .row-title::after,
   .soon::after,
   .button-primary,
-  .button-quiet {
+  .footer-links a,
+  .replay {
     transition: none;
   }
 }
