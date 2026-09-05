@@ -47,8 +47,11 @@ export function Metrics() {
     return (
       <section className="metrics">
         <h1>Which filters are doing the work</h1>
+        {/* Covers both "not installed" and "installed but too old to answer" — the two are
+            indistinguishable from here, and telling an existing user to install something
+            they already have reads as broken. */}
         <p className="lede">
-          These numbers live in your own browser, so this page needs ApplyW installed to show them. Nothing is
+          These numbers live in your own browser, so this page needs ApplyW 0.1.5 or newer to show them. Nothing is
           collected, and nothing is sent anywhere.
         </p>
         <div className="actions">
