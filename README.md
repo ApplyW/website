@@ -53,6 +53,24 @@ a counter drops from 6 to 2. Once the sequence finishes, every row becomes a tog
 extension's own Hide/Unhide, playable before installing anything. That's why the copy is
 only two lines: enumerating the filters in prose would say the same thing twice.
 
+## The metrics page
+
+`/#metrics` shows which of the visitor's own filters is hiding the most listings. The data
+comes from the installed extension over `chrome.runtime.sendMessage` — a browser-internal
+call, not a network request — so the page shows an install prompt to anyone without it.
+
+Two views of one dataset because they answer different questions: a stacked strip for share
+of the whole, then ranked bars, which share a baseline and are therefore what you actually
+compare lengths against. **Colour is bound to the reason, never to its rank** — the list
+re-sorts by count, so if colour followed position a filter would change colour between
+visits and mean nothing.
+
+The palette is the validated categorical theme, checked against this page's own surfaces in
+both modes. Three light-mode slots fall under 3:1 contrast, which is why every bar carries a
+visible label and number — that is required relief, not decoration. Dark mode uses the
+documented dark step for slot 1 rather than the brand blue, which sits outside the lightness
+band on a dark surface. Re-run the validator before changing any of these values.
+
 ## Design
 
 The visual system is shared with the extension popup
