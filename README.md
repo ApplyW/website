@@ -24,6 +24,21 @@ npm install
 npm run dev
 ```
 
+### Testing the metrics page locally
+
+The metrics page reads its numbers from the installed extension, and two things stop that
+working against a local build:
+
+1. **The extension id differs.** An unpacked extension gets its own id, and a new one each
+   time it is removed and re-added. Copy it from `chrome://extensions` into `.env.local`
+   as `VITE_APPLYW_EXTENSION_ID`, then restart the dev server.
+2. **The dev server origin has to be allowed.** The extension's `externally_connectable`
+   adds `http://localhost:5173/*` in development builds only, so run the extension with
+   `npm run dev` (not a production build) and reload it in `chrome://extensions`.
+
+Without both, `/#metrics` correctly shows the "install ApplyW" state — that is the page
+working, not failing.
+
 ## The page
 
 **It never scrolls.** The nav sits against the top of the viewport and the footer against

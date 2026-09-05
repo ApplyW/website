@@ -5,7 +5,10 @@
 // because its manifest names this exact origin in `externally_connectable`. Nothing is
 // sent to a server, and no data about anyone reaches us.
 
-const EXTENSION_ID = 'imllbmbpfpgnibchclonahimmkjanjhp'
+// The published extension. A locally loaded unpacked build gets a different id every time
+// it is added to Chrome, so point VITE_APPLYW_EXTENSION_ID at it in .env.local to test
+// against your own build — see the README.
+const EXTENSION_ID = import.meta.env.VITE_APPLYW_EXTENSION_ID ?? 'imllbmbpfpgnibchclonahimmkjanjhp'
 // If the extension is missing, Chrome usually calls back with lastError set — but on some
 // versions it simply never calls back at all, so a timeout is what stops the page sitting
 // on "Loading" forever.
