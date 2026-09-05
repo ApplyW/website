@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import logoUrl from './assets/applyw-logo.png'
+import { Metrics } from './Metrics'
 
 const STORE_URL = 'https://chromewebstore.google.com/detail/imllbmbpfpgnibchclonahimmkjanjhp'
 const REPO_URL = 'https://github.com/ApplyW/extension'
@@ -54,6 +55,18 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
+// Hash routing rather than a router library: two views on a statically hosted site, and
+// a hash needs no server rewrite rules to survive a refresh or a shared link.
+function useHashRoute(): string {
+  const [route, setRoute] = useState(() => window.location.hash.replace('#', ''))
+  useEffect(() => {
+    const onChange = (): void => setRoute(window.location.hash.replace('#', ''))
+    window.addEventListener('hashchange', onChange)
+    return () => window.removeEventListener('hashchange', onChange)
+  }, [])
+  return route
+}
+
 // Same angular beetle as the extension popup: straight segments and flat stroke ends
 // only, so it sits in the monogram's geometry rather than looking like a stock glyph.
 function BugIcon() {
@@ -91,6 +104,12 @@ export function App() {
   const [isPlayable, setIsPlayable] = useState(false)
   // Bumping this restarts the opening sequence from scratch.
   const [runId, setRunId] = useState(0)
+  const isMetrics = useHashRoute() === 'metrics'
+
+  // The home view is locked to one screen; the metrics view has to be free to scroll.
+  useEffect(() => {
+    document.body.dataset.route = isMetrics ? 'metrics' : 'home'
+  }, [isMetrics])
 
   useEffect(() => {
     if (prefersReducedMotion()) {
@@ -200,14 +219,15 @@ export function App() {
           <img src={logoUrl} alt="" width={30} height={30} />
           ApplyW
         </a>
-        {/* Not a link: there is nothing to navigate to yet, and a dead <a> is worse than
-            an honest disabled control. The tooltip shows on hover and on keyboard focus. */}
-        <span aria-disabled="true" tabIndex={0} data-tip="coming…" {...enter(60, 'soon')}>
-          Metrics
-        </span>
+        <a href={isMetrics ? '#' : '#metrics'} {...enter(60, 'nav-link')}>
+          {isMetrics ? 'Back' : 'Metrics'}
+        </a>
       </header>
 
       <main>
+        {isMetrics ? (
+          <Metrics />
+        ) : (
         <section className="hero">
           <div>
             <div {...enter(80, 'mark')} />
@@ -270,7 +290,7 @@ export function App() {
             </div>
           </div>
         </section>
-
+        )}
       </main>
 
       <footer className="footer">

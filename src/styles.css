@@ -84,15 +84,15 @@ a {
   padding: clamp(8px, 1.2vw, 18px) clamp(24px, 3vw, 44px) 0;
 }
 
-/* Scrolling is only locked where the page is genuinely known to fit. Below these sizes it
-   can't, and hiding the overflow would put content permanently out of reach. */
+/* Scrolling is only locked on the home view, and only where the page is genuinely known
+   to fit. Below these sizes it can't, and hiding the overflow would put content
+   permanently out of reach; the metrics view is a list that has to be free to scroll. */
 @media (min-width: 881px) and (min-height: 660px) {
-  html,
-  body {
+  body[data-route='home'] {
     overflow: hidden;
   }
 
-  .page {
+  body[data-route='home'] .page {
     height: 100dvh;
   }
 }
@@ -322,39 +322,6 @@ main {
 .brand img {
   border-radius: var(--aw-radius);
   box-shadow: 0 0 0 1px var(--aw-rule);
-}
-
-/* Metrics, not yet built. Styled as plainly unavailable rather than as a link. */
-.soon {
-  position: relative;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--aw-mute);
-  cursor: default;
-}
-
-.soon::after {
-  content: attr(data-tip);
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  padding: 4px 9px;
-  font-size: 13px;
-  font-weight: 400;
-  white-space: nowrap;
-  color: var(--aw-surface);
-  background: var(--aw-mark);
-  border-radius: var(--aw-radius);
-  opacity: 0;
-  transform: translateY(-3px);
-  pointer-events: none;
-  transition: opacity 120ms ease, transform 120ms ease;
-}
-
-.soon:hover::after,
-.soon:focus-visible::after {
-  opacity: 1;
-  transform: none;
 }
 
 /* Hero */
@@ -599,6 +566,225 @@ h1 {
   color: var(--aw-signal);
 }
 
+/* Metrics
+   ------------------------------------------------------------------
+   Two views of one dataset, because they answer different questions: the stacked strip
+   shows share of the whole, the ranked bars share a baseline so lengths can actually be
+   compared — which is the "what is pulling its weight" question.
+
+   Colour is bound to the reason, never to its rank: the list re-sorts by count, but a
+   filter keeps its slot colour so it means the same thing between visits.
+
+   Palette is the validated categorical theme, checked with the data-viz validator against
+   this page's own surfaces. Light-mode slots 2, 3 and 4 sit under 3:1 against white, so
+   every bar carries a visible label and number — that is the required relief, not
+   optional. Dark slot 0 is the documented dark step rather than the brand blue, which
+   sits outside the lightness band on a dark surface. */
+
+.metrics {
+  --slot-0: #1a7bff;
+  --slot-1: #eb6834;
+  --slot-2: #1baf7a;
+  --slot-3: #eda100;
+  --slot-4: #e87ba4;
+  --slot-5: #008300;
+  --slot-6: #4a3aa7;
+
+  padding: clamp(20px, 3vw, 44px) 0 clamp(32px, 4vw, 64px);
+  max-width: 760px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .metrics {
+    --slot-0: #3987e5;
+    --slot-1: #d95926;
+    --slot-2: #199e70;
+    --slot-3: #c98500;
+    --slot-4: #d55181;
+    --slot-5: #008300;
+    --slot-6: #9085e9;
+  }
+}
+
+.slot-0 { background: var(--slot-0); }
+.slot-1 { background: var(--slot-1); }
+.slot-2 { background: var(--slot-2); }
+.slot-3 { background: var(--slot-3); }
+.slot-4 { background: var(--slot-4); }
+.slot-5 { background: var(--slot-5); }
+.slot-6 { background: var(--slot-6); }
+
+.metrics h1 {
+  margin-bottom: clamp(10px, 1vw, 16px);
+}
+
+.metrics-total {
+  margin: 0 0 clamp(16px, 2vw, 26px);
+  font-size: clamp(15px, 1.15vw, 19px);
+  color: var(--aw-mute);
+}
+
+.metrics-total b {
+  font-size: clamp(26px, 2.6vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--aw-text);
+}
+
+/* The 2px gaps are the required separation between adjacent fills — without them two
+   segments of similar lightness merge into one block. */
+.stack {
+  display: flex;
+  gap: 2px;
+  height: 14px;
+  margin-bottom: clamp(20px, 2.4vw, 32px);
+}
+
+.stack-part {
+  min-width: 3px;
+  border-radius: 1px;
+}
+
+.ranks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ranks > li {
+  padding: clamp(10px, 1vw, 14px) 0;
+  border-top: 1px solid var(--aw-rule);
+}
+
+.rank-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.swatch {
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.rank-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: clamp(14px, 1.05vw, 16px);
+  font-weight: 600;
+}
+
+.rank-note {
+  display: block;
+  font-size: 0.8em;
+  font-weight: 400;
+  color: var(--aw-mute);
+}
+
+.rank-bar {
+  flex: 0 1 200px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--aw-recess);
+  overflow: hidden;
+}
+
+/* Anchored to the baseline at the left, rounded only at the data end. */
+.rank-fill {
+  display: block;
+  height: 100%;
+  border-radius: 0 4px 4px 0;
+}
+
+.rank-value {
+  flex: 0 0 auto;
+  min-width: 74px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.rank-value b {
+  font-size: clamp(14px, 1.05vw, 16px);
+  font-weight: 700;
+}
+
+.rank-share {
+  display: block;
+  font-size: 12px;
+  color: var(--aw-mute);
+}
+
+/* Excluded-word breakdown */
+
+.words {
+  padding-left: 22px;
+}
+
+.words-toggle {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--aw-signal);
+  cursor: pointer;
+}
+
+.words-toggle:hover {
+  text-decoration: underline;
+}
+
+.word-list {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+}
+
+.word-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 0;
+}
+
+.word-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 14px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.word-count {
+  flex: 0 0 auto;
+  min-width: 48px;
+  text-align: right;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.words-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--aw-mute);
+}
+
+.nav-link {
+  font-size: clamp(14px, 1vw, 16px);
+  font-weight: 600;
+  color: var(--aw-text);
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  color: var(--aw-signal);
+}
+
 /* Buttons */
 
 .button-primary {
@@ -735,7 +921,6 @@ h1 {
 
   .row-button,
   .row-title::after,
-  .soon::after,
   .button-primary,
   .footer-links a,
   .replay {
