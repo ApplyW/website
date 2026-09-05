@@ -1,6 +1,6 @@
 # ApplyW — Website
 
-[![Website](https://img.shields.io/badge/website-live-1c6feb.svg)](https://applyw.chudnovskyi-v.workers.dev/)
+[![Website](https://img.shields.io/badge/website-live-1c6feb.svg)](https://applyw.app/)
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/imllbmbpfpgnibchclonahimmkjanjhp?color=1c6feb&label=chrome%20web%20store)](https://chromewebstore.google.com/detail/imllbmbpfpgnibchclonahimmkjanjhp)
 [![License: MIT](https://img.shields.io/badge/license-MIT-1c6feb.svg)](./LICENSE)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-1c6feb.svg)](https://github.com/ApplyW/extension/issues)
@@ -8,8 +8,8 @@
 Marketing site for [ApplyW](https://github.com/ApplyW/extension), a Chrome extension that
 declutters LinkedIn's job search page.
 
-**Live:** [applyw.chudnovskyi-v.workers.dev](https://applyw.chudnovskyi-v.workers.dev/) —
-deployed on Cloudflare Workers, redeploys on every push to `main`.
+**Live:** [applyw.app](https://applyw.app/) — deployed on Cloudflare Workers, redeploys
+on every push to `main`.
 
 ![The ApplyW landing page: the headline, the install button, and a mock LinkedIn result list striking out the jobs each filter removes](docs/screenshot.png)
 
@@ -133,8 +133,9 @@ from a subpath rather than a domain root.
 The URL belongs in the Chrome Web Store listing's **Website** field — that is what
 publicly ties the site to the extension.
 
-Anything dropped in `public/` is served from the site root, which is how to place a Google
-Search Console verification file (no DNS access on a `workers.dev` subdomain).
+Anything dropped in `public/` is served from the site root, which is one way to place a
+Google Search Console verification file. On `applyw.app` the DNS method is available and
+is the better one — it verifies the whole domain rather than a single served file.
 
 ### The site's own address
 
@@ -144,22 +145,26 @@ for it. The canonical link, the `og:`/`twitter:` preview tags, `robots.txt` and
 `sitemap.xml` are emitted by the build rather than sitting in `public/`, because a static
 file there cannot name the site absolutely.
 
-Moving to a custom domain, in order:
+The site moved from `applyw.chudnovskyi-v.workers.dev` to **applyw.app**. That leaves one
+step outstanding, and it can only be taken after the extension release carrying `applyw.app`
+has actually rolled out to users:
 
-1. Point the domain at the Worker (Cloudflare → the Worker → **Domains & Routes**), and
-   keep the `workers.dev` URL serving as well until step 4 is done.
-2. Change `SITE_URL` here and deploy. Everything above follows from it.
-3. Add the new origin to `SITE_ORIGINS` in the extension's `manifest.config.ts`, **keeping
-   the old one**, and ship that to the store. Until that review clears — days, not minutes
-   — a visitor on the new domain has an extension that refuses to talk to it, and the
-   metrics page will tell them to install what they already have.
-4. Once the new version has rolled out, drop the old origin from `SITE_ORIGINS` and the
-   old address from the Chrome Web Store listing's **Website** field.
-5. Verify the new domain in Google Search Console (DNS verification is available on a
-   domain you own, unlike a `workers.dev` subdomain) and submit `/sitemap.xml`.
+- **Still to do:** drop `https://applyw.chudnovskyi-v.workers.dev` from `SITE_ORIGINS` in
+  [`extension/src/shared/site.ts`](https://github.com/ApplyW/extension/blob/main/src/shared/site.ts),
+  stop serving the `workers.dev` URL, and remove it from the Chrome Web Store listing.
+  An origin left in that list stays permitted to read the user's counts.
 
-Do not reorder 2 and 3. Shipping the extension first is harmless; shipping the site first
-breaks metrics for everyone for the length of a store review.
+Until then the `workers.dev` address must keep serving: anyone still on the previously
+published extension can only talk to that origin.
+
+If this ever happens again, the order is what matters. Ship the extension with **both**
+origins first and let it clear review, then flip `SITE_URL` here. Doing it the other way —
+which is what happened this time — means every visitor on the new domain gets an extension
+that refuses to answer, and a metrics page telling them to install what they already have,
+for the whole length of a store review.
+
+If `www.applyw.app` is ever served directly instead of redirecting to the apex, it needs
+its own entry in `SITE_ORIGINS`: an origin is an exact host, and `www` is a different one.
 
 ## Related repositories
 

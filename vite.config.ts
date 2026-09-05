@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 // The one place the site's public address lives. The canonical link, the social preview
 // tags, robots.txt and the sitemap are all built from it, so moving to a custom domain is
 // this line and nothing else. No trailing slash.
-const SITE_URL = 'https://applyw.chudnovskyi-v.workers.dev'
+const SITE_URL = 'https://applyw.app'
 
 // index.html can't read a constant on its own, and files in public/ are copied verbatim,
 // so anything needing an absolute URL is filled in here instead. The placeholder is
